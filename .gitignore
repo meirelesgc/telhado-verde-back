@@ -1,0 +1,62 @@
+# 🔐 Ambiente virtual
+
+venv/
+env/
+.venv/
+
+# 🐍 Python
+
+**pycache**/
+*.py[cod]
+*$py.class
+
+# 📦 Distribuição / build
+
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# 🔧 Logs
+
+*.log
+
+# 🔑 Variáveis de ambiente
+
+.env
+.env.*
+tv/
+
+# 🧪 Testes / cobertura
+
+.coverage
+htmlcov/
+.pytest_cache/
+
+# 🗄️ Banco de dados
+
+*.db
+*.sqlite3
+
+# 🧠 IDEs / editores
+
+.vscode/
+.idea/
+
+# 🪟 Sistema operacional
+
+.DS_Store
+Thumbs.db
+
+# 📁 Arquivos temporários
+
+*.swp
+*.tmp
+
+# 🔥 Uvicorn / FastAPI
+
+*.pid
+
+# 📊 Migrations (opcional - depende do seu caso)
+
+# alembic/versions/
