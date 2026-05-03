@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from database import get_db
-from models.dispositivo import Dispositivo
-from schemas.dispositivo_schema import DispositivoCreate
+
+from app.db.database import get_db
+from app.models.dispositivo import Dispositivo
+from app.schemas.dispositivo_schema import DispositivoCreate
 
 router = APIRouter(prefix="/dispositivo", tags=["Dispositivo"])
+
 
 @router.post("/")
 def inserir_dispositivo(data: DispositivoCreate, db: Session = Depends(get_db)):
@@ -13,7 +15,4 @@ def inserir_dispositivo(data: DispositivoCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(novo)
 
-    return {
-        "status": "ok",
-        "id_dispositivo": novo.id
-    }
+    return {"status": "ok", "id_dispositivo": novo.id}
