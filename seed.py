@@ -30,11 +30,17 @@ def popular_banco(num_dispositivos, num_registros_por_dispositivo):
     try:
         limpar_banco(db)
 
+        linhas = ["A", "B", "C", "D"]
+        colunas = ["1", "2", "3", "4"]
+        nomes_telhados = [f"Telhado Verde {l}{c}" for l in linhas for c in colunas]
+
         dispositivos = []
-        for i in range(1, num_dispositivos + 1):
+        for i in range(num_dispositivos):
             lat = round(random.uniform(-23.6000, -23.5000), 4)
             lon = round(random.uniform(-46.7000, -46.5000), 4)
-            disp = Dispositivo(nome=f"Dispositivo {i}", latitude=lat, longitude=lon)
+            nome_escolhido = nomes_telhados[i % len(nomes_telhados)]
+
+            disp = Dispositivo(nome=nome_escolhido, latitude=lat, longitude=lon)
             dispositivos.append(disp)
 
         db.add_all(dispositivos)
@@ -46,40 +52,43 @@ def popular_banco(num_dispositivos, num_registros_por_dispositivo):
         leituras = []
         id_sensor_base = 1
 
+        agora = datetime.now()
+        sete_dias_atras = agora - timedelta(days=7)
+        segundos_totais = int((agora - sete_dias_atras).total_seconds())
+
         for dispositivo in dispositivos:
-            id_sensor_temp = id_sensor_base
-            id_sensor_umid = id_sensor_base + 1
-            id_sensor_base += 2
+            qtd_sensores = random.randint(1, 8)
+            sensores = []
 
-            tempo_atual = datetime.now() - timedelta(
-                minutes=num_registros_por_dispositivo * 10
-            )
-            temp_atual = gerar_valor_natural("temperatura")
-            umid_atual = gerar_valor_natural("umidade")
+            for _ in range(qtd_sensores):
+                tipo_sensor = random.choice(["temperatura", "umidade"])
+                sensores.append({
+                    "id_sensor": id_sensor_base,
+                    "tipo": tipo_sensor,
+                    "valor_atual": gerar_valor_natural(tipo_sensor),
+                })
+                id_sensor_base += 1
 
-            for _ in range(num_registros_por_dispositivo):
-                temp_atual = gerar_valor_natural("temperatura", temp_atual)
-                umid_atual = gerar_valor_natural("umidade", umid_atual)
+            timestamps = [
+                sete_dias_atras + timedelta(seconds=random.randint(0, segundos_totais))
+                for _ in range(num_registros_por_dispositivo)
+            ]
+            timestamps.sort()
 
-                leituras.append(
-                    Leitura(
-                        tipo="temperatura",
-                        id_sensor=id_sensor_temp,
-                        id_dispositivo=dispositivo.id,
-                        valor=temp_atual,
-                        criado_em=tempo_atual,
+            for tempo_atual in timestamps:
+                for sensor in sensores:
+                    sensor["valor_atual"] = gerar_valor_natural(
+                        sensor["tipo"], sensor["valor_atual"]
                     )
-                )
-                leituras.append(
-                    Leitura(
-                        tipo="umidade",
-                        id_sensor=id_sensor_umid,
-                        id_dispositivo=dispositivo.id,
-                        valor=umid_atual,
-                        criado_em=tempo_atual,
+                    leituras.append(
+                        Leitura(
+                            tipo=sensor["tipo"],
+                            id_sensor=sensor["id_sensor"],
+                            id_dispositivo=dispositivo.id,
+                            valor=sensor["valor_atual"],
+                            criado_em=tempo_atual,
+                        )
                     )
-                )
-                tempo_atual += timedelta(minutes=10)
 
         db.add_all(leituras)
         db.commit()
@@ -89,6 +98,6 @@ def popular_banco(num_dispositivos, num_registros_por_dispositivo):
 
 
 if __name__ == "__main__":
-    qtd_disp = int(input("Informe a quantidade de dispositivos: "))
-    qtd_reg = int(input("Informe a quantidade de registros por dispositivo: "))
+    qtd_disp = int(input("Informe a quantidade de telhados verdes: "))
+    qtd_reg = int(input("Informe a quantidade de registros por telhado verde: "))
     popular_banco(qtd_disp, qtd_reg)
